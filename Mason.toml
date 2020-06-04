@@ -1,0 +1,6 @@
+[brick]
+name = "DistributedLinearAlgebra"
+version = "0.1.0"
+chplVersion = "1.23.0"
+
+[dependencies]
