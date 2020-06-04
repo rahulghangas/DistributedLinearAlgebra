@@ -4,3 +4,10 @@ version = "0.1.0"
 chplVersion = "1.23.0"
 
 [dependencies]
+
+
+[examples]
+examples = ["openCLDeviceQuery.chpl"]
+
+[examples.openCLDeviceQuery]
+compopts = "-lblas -lm"
