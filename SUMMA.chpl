@@ -2,19 +2,18 @@ use Time;
 use BlockDist;
 use LinearAlgebra;
 
-
-config const order = 10,
+config type dtype = real;
+config const order = 10;
 
 const vecRange = 0..#order;
-
 const matrixSpace = {vecRange, vecRange};
 
-config var N_1 = 2;
-config var N_2 = numLocales / N_1;
-if numLocales == 1 {
-  N_1 = 1;
-  N_2 = 1;
-}
+// config var N_1 = 2;
+// config var N_2 = numLocales / N_1;
+// if numLocales == 1 {
+//   N_1 = 1;
+//   N_2 = 1;
+// }
 
 const matrixDom : domain(2) dmapped Block(boundingBox = matrixSpace) = matrixSpace;
 
