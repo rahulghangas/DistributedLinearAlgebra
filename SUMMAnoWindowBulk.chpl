@@ -49,9 +49,6 @@ proc distributedDot(A : [] ?t, B : [] t, window : int = 500) {
   // use VisualDebug;
   // startVdebug("comm");
 
-  const AcolDim = A.domain.dim(1);
-  const BrowDim = B.domain.dim(0);
-
   coforall loc in targetLocalesA {
     on loc {
       const localDomainA = A.localSubdomain();
