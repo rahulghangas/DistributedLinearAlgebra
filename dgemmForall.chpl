@@ -75,27 +75,35 @@ if windowSize == 0 {
   t.stop();
 }
 else {
+  const commonDim = A.domain.dim(1);
   for niter in 0..iterations {
     coforall loc in A.targetLocales() with (ref t) {
+      if loc.id==0 && niter==1 then t.start();
       on loc {
-        if here.id==0 && niter==1 then t.start();
-        var localDomainA = A.localSubdomain();
-        var localDomainB = B.localSubdomain();
-        var localDomainC = C.localSubdomain();
+        const localDomainC = C.localSubdomain();
+        const (localDim0, localDim1) = localDomainC.dims();
+        const windowRange = 0..#windowSize;
+        var subArrayA : [localDim0, windowRange] dtype;
+        var subArrayB : [windowRange, localDim1] dtype;
 
-        for subArrayChunk in block(A.domain.dim(1), windowSize) {
-          var subArrayA : [localDomainA.dim(0), subArrayChunk] A.eltType;
-          var subArrayB : [subArrayChunk, localDomainB.dim(1)] B.eltType;
+        for subArrayChunk in block(commonDim, windowSize) {
+          var chunkSize = subArrayChunk.size;
 
-          forall i in localDomainA.dim(0) {
-            forall j in subArrayChunk {
-              subArrayA[i, j] = A[i, j];
+          forall i in localDim0 {
+            forall (j, subJ) in zip(subArrayChunk, 0..) {
+              subArrayA[i, subJ] = A[i, j];
             }
           }
-          forall i in subArrayChunk {
-            forall j in localDomainB.dim(1) {
-              subArrayB[i, j] = B[i, j];
+          forall (i, subI) in zip(subArrayChunk, 0..) {
+            forall j in localDim1 {
+              subArrayB[subI, j] = B[i, j];
             }
+          }
+
+          if chunkSize < windowSize {
+            var rest = windowRange#-(windowSize-chunkSize);
+            subArrayA[localDim0, rest] = 0;
+            subArrayB[rest, localDim1] = 0;
           }
 
           C.localSlice(localDomainC) += dot(subArrayA, subArrayB);
